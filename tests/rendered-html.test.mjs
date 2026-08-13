@@ -1,0 +1,147 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const developmentPreviewMeta =
+  /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
+
+async function loadWorker() {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${Math.random()}`);
+  const { default: worker } = await import(workerUrl.href);
+  return worker;
+}
+
+async function fetchHtml(path = "/") {
+  const worker = await loadWorker();
+  const response = await worker.fetch(
+    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+  assert.equal(response.status, 200);
+  return response.text();
+}
+
+test("renders development preview metadata", async () => {
+  assert.match(await fetchHtml(), developmentPreviewMeta);
+});
+
+test("renders the type filter and seat sort while retaining lifespan support", async () => {
+  const [html, component] = await Promise.all([
+    fetchHtml(),
+    readFile(new URL("../app/components/PartyDirectory.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(html, />Type</);
+  assert.match(html, /Parliamentary seats/);
+  assert.match(html, /Oldest first/);
+  assert.match(component, /formatLifeSpan\(party\.established, party\.dissolved\)/);
+});
+
+test("uses seat sorting by default and credits humans for the entries", async () => {
+  const [html, component] = await Promise.all([
+    fetchHtml(),
+    readFile(new URL("../app/components/PartyDirectory.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(component, /comparePartiesBySeats/);
+  assert.match(component, /useState\("seats"\)/);
+  assert.match(
+    html,
+    /The website structure was vibecoded using ChatGPT\. All entries were added by humans\./,
+  );
+});
+
+test("renders optional registration and delegalisation dates only on party pages", async () => {
+  const indexHtml = await fetchHtml();
+  assert.doesNotMatch(indexHtml, />Registered</);
+  assert.doesNotMatch(indexHtml, />Delegalised</);
+
+  const registeredHtml = await fetchHtml("/party/kzAdilet");
+  assert.match(registeredHtml, />Registered</);
+  assert.match(registeredHtml, /6 January 2026/);
+
+  const delegalisedHtml = await fetchHtml("/party/ruKPRSFSR");
+  assert.match(delegalisedHtml, />Delegalised</);
+  assert.match(delegalisedHtml, /6 November 1991/);
+});
+
+test("renders archived websites and social-media links in Party details", async () => {
+  const [uskorenieHtml, gerbHtml, ppHtml, unitedRussiaHtml] = await Promise.all([
+    fetchHtml("/party/bgUskorenie"),
+    fetchHtml("/party/bgGERB"),
+    fetchHtml("/party/bgPP"),
+    fetchHtml("/party/ruER"),
+  ]);
+
+  assert.match(uskorenieHtml, />Archived website</);
+  assert.match(uskorenieHtml, /href="https:\/\/www\.facebook\.com\/klubuskorenie"/);
+  assert.match(gerbHtml, /href="https:\/\/www\.youtube\.com\/@gerb-official"/);
+  assert.match(gerbHtml, /href="https:\/\/x\.com\/PPGERB"/);
+  assert.match(ppHtml, /href="https:\/\/www\.instagram\.com\/prodalzhavamepromyanata\/"/);
+  assert.match(ppHtml, /href="https:\/\/www\.tiktok\.com\/@promenibg"/);
+  assert.match(unitedRussiaHtml, /href="https:\/\/t\.me\/er_molnia"/);
+  assert.match(unitedRussiaHtml, /href="https:\/\/vk\.ru\/er_ru"/);
+});
+
+test("renders commented labels and optional prose without hash markers", async () => {
+  const jpHtml = await fetchHtml("/party/peJP");
+  assert.match(jpHtml, /Castillismo \(factions, since 2025\)/);
+  assert.doesNotMatch(jpHtml, /Castillismo\s*#/);
+
+  const bdpHtml = await fetchHtml("/party/peBDP");
+  assert.match(bdpHtml, />Relations</);
+  assert.match(bdpHtml, /Centre-left to left-wing bloc\./);
+});
+
+test("renders missing party references as red links", async () => {
+  const html = await fetchHtml("/party/atFPO");
+  assert.match(html, /class="missing-party-link"/);
+  assert.match(html, /href="\/party\/atVdU"/);
+  assert.match(html, />Federation of Independents<\/a>/);
+});
+
+test("renders proportional seat bars when legislature totals are known", async () => {
+  const html = await fetchHtml("/party/ruER");
+  assert.match(html, /role="progressbar"/);
+  assert.match(html, /aria-label="State Duma: 315 of 450 seats"/);
+  assert.match(html, /--seat-share:70%/);
+  assert.match(html, /aria-label="Federation Council: 136 of 178 seats"/);
+});
+
+test("sizes each visible logo frame to the source aspect ratio without a cropped duplicate", async () => {
+  const [component, styles] = await Promise.all([
+    readFile(new URL("../app/components/LogoImage.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(component, /--logo-aspect/);
+  assert.match(component, /logo-frame-\$\{frame\?\.orientation/);
+  assert.doesNotMatch(component, /logo-edge-fill/);
+  assert.match(styles, /\.logo-frame-landscape[\s\S]*?width: calc\(100% - 2px\)/);
+  assert.match(styles, /\.party-logo-wrap \{[\s\S]*?--logo-frame-size: var\(--card-logo-size, 92px\)/);
+  assert.match(styles, /\.logo-frame-portrait[\s\S]*?height: calc\(var\(--logo-frame-size, 100%\) - 2px\)/);
+  assert.match(styles, /\.party-logo-wrap \{[\s\S]*?overflow: visible;/);
+  assert.match(styles, /\.logo-image-stack \{[\s\S]*?max-height: calc\(var\(--logo-frame-size, 100%\) - 2px\)/);
+  assert.match(styles, /\.logo-image-stack > img[\s\S]*?object-fit: contain;/);
+  assert.doesNotMatch(styles, /object-fit: cover/);
+});
+
+test("keeps record-page logos at the record wrapper size", async () => {
+  const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(styles, /\.record-logo-wrap \{[\s\S]*?width: 150px;[\s\S]*?height: 150px;/);
+  assert.match(styles, /\.logo-image-stack \{[\s\S]*?max-width: calc\(var\(--logo-frame-size, 100%\) - 2px\)/);
+});
+
+test("renders the index in batches of 100 and observes the scroll sentinel", async () => {
+  const component = await readFile(
+    new URL("../app/components/PartyDirectory.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(component, /const INDEX_PAGE_SIZE = 100/);
+  assert.match(component, /visible\.slice\(0, renderLimit\)/);
+  assert.match(component, /new IntersectionObserver/);
+  assert.match(component, /current\.limit : INDEX_PAGE_SIZE\) \+ INDEX_PAGE_SIZE/);
+  assert.match(component, /ref=\{loadMoreRef\}/);
+});
