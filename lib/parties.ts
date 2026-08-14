@@ -1,13 +1,22 @@
 import database from "../data/parties.json";
 
-export type Party = (typeof database.parties)[number];
+export type FormerLogo = {
+  url: string;
+  until: string | null;
+};
+
+export type Party = Omit<(typeof database.parties)[number], "formerLogos"> & {
+  formerLogos: FormerLogo[];
+};
+
 export type RichTextRun = {
   text: string;
   bold: boolean;
   italic: boolean;
 };
 
-export const parties = database.parties;
+export const parties = database.parties as Party[];
+
 export const countries = Array.from(
   new Set(parties.map((party) => party.country).filter(Boolean)),
 ).sort((a, b) => a.localeCompare(b, "en"));
