@@ -95,9 +95,13 @@ export function PartyDirectory({ countries, parties }: Props) {
 
   const statuses = useMemo(
     () =>
-      Array.from(new Set(parties.map((party) => party.status).filter(Boolean))).sort(
-        (a, b) => a.localeCompare(b, "en"),
-      ),
+      Array.from(
+  new Set(
+    parties
+      .map((party) => party.status)
+      .filter((status): status is string => Boolean(status)),
+  ),
+).sort((a, b) => a.localeCompare(b, "en")),
     [parties],
   );
 
