@@ -4,7 +4,13 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "../../components/SiteHeader";
 import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
-import { formatDate, getParty, parties } from "../../../lib/parties";
+import {
+  formatDate,
+  getIncomingRelations,
+  getParty,
+  parties,
+} from "../../../lib/parties";
+import { partyLinkLabel } from "../../../lib/wiki-links";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -41,15 +47,19 @@ function SeatRow({
   value: number | null;
 }) {
   if (value == null) return null;
-  const share = total != null && total > 0
-    ? Math.min(100, Math.max(0, (value / total) * 100))
-    : null;
+  const share =
+    total != null && total > 0
+      ? Math.min(100, Math.max(0, (value / total) * 100))
+      : null;
 
   return (
     <div className="seat-row">
       <span>{label}</span>
       <div className="seat-result">
-        <strong>{value}{total != null ? ` / ${total}` : ""}</strong>
+        <strong>
+          {value}
+          {total != null ? ` / ${total}` : ""}
+        </strong>
         {share != null && total != null ? (
           <span
             className="seat-bar"
@@ -61,10 +71,12 @@ function SeatRow({
           >
             <span
               className="seat-bar-fill"
-              style={{
-                "--seat-color": color,
-                "--seat-share": `${share}%`,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--seat-color": color,
+                  "--seat-share": `${share}%`,
+                } as React.CSSProperties
+              }
             />
           </span>
         ) : null}
@@ -83,6 +95,7 @@ export default async function PartyPage({ params }: PageProps) {
   const delegalised = formatDate(party.delegalised);
   const dissolved = formatDate(party.dissolved);
   const lastEdited = formatDate(party.lastEdited);
+  const incoming = getIncomingRelations(party.id);
   const hasSeats = [
     party.seats.legislature,
     party.seats.lowerHouse,
@@ -110,7 +123,10 @@ export default async function PartyPage({ params }: PageProps) {
           <strong>{party.acronym ?? party.name}</strong>
         </div>
 
-        <section className="record-heading" style={{ "--party-color": party.color } as React.CSSProperties}>
+        <section
+          className="record-heading"
+          style={{ "--party-color": party.color } as React.CSSProperties}
+        >
           <div className="record-logo-wrap">
             <LogoImage
               src={party.logo}
@@ -136,7 +152,9 @@ export default async function PartyPage({ params }: PageProps) {
                 </Link>
               ) : null}
             </div>
-            <h1><RichText text={party.name} runs={party.formatting.name} /></h1>
+            <h1>
+              <RichText text={party.name} runs={party.formatting.name} />
+            </h1>
             {party.nativeName && party.nativeName !== party.name ? (
               <p className="native-party-name">
                 <RichText text={party.nativeName} runs={party.formatting.nativeName} />
@@ -222,12 +240,35 @@ export default async function PartyPage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {party.relations ? (
+            {party.relations || incoming.length > 0 ? (
               <section className="relations-panel">
                 <h2>Relations</h2>
-                <div className="relations-copy">
-                  <WikiText text={party.relations} runs={party.formatting.relations} />
-                </div>
+                {party.relations ? (
+                  <div className="relations-copy">
+                    <WikiText text={party.relations} runs={party.formatting.relations} />
+                  </div>
+                ) : null}
+                {incoming.length > 0 ? (
+                  <div
+                    className="relations-copy"
+                    style={{ marginTop: party.relations ? "0.75rem" : 0 }}
+                  >
+                    {party.relations ? (
+                      <p style={{ margin: "0 0 0.35rem", fontSize: "0.85em", opacity: 0.75 }}>
+                        Also linked from
+                      </p>
+                    ) : null}
+                    <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+                      {incoming.map((other) => (
+                        <li key={other.id}>
+                          <Link href={`/party/${other.id}`}>
+                            {partyLinkLabel(other, other.id)}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </section>
             ) : null}
           </aside>
@@ -240,7 +281,9 @@ export default async function PartyPage({ params }: PageProps) {
                   <WikiText text={party.description} runs={party.formatting.description} />
                 </div>
               ) : (
-                <p className="missing-copy">No descriptive text has been added to this record yet.</p>
+                <p className="missing-copy">
+                  No descriptive text has been added to this record yet.
+                </p>
               )}
             </section>
 
@@ -275,7 +318,9 @@ export default async function PartyPage({ params }: PageProps) {
                           fallback={party.acronym ?? party.name.slice(0, 2)}
                         />
                       </div>
-                      <figcaption>{item.until ? `Used until ${formatDate(item.until)}` : "Earlier logo"}</figcaption>
+                      <figcaption>
+                        {item.until ? `Used until ${formatDate(item.until)}` : "Earlier logo"}
+                      </figcaption>
                     </figure>
                   ))}
                 </div>
@@ -288,16 +333,24 @@ export default async function PartyPage({ params }: PageProps) {
                 <ol>
                   {party.sources.map((source) => (
                     <li key={source}>
-                      <a href={source} target="_blank" rel="noreferrer">{source}</a>
+                      <a href={source} target="_blank" rel="noreferrer">
+                        {source}
+                      </a>
                     </li>
                   ))}
                 </ol>
               ) : (
-                <p className="missing-copy">No source links have been entered in the spreadsheet.</p>
+                <p className="missing-copy">
+                  No source links have been entered in the spreadsheet.
+                </p>
               )}
               <div className="maintenance-line">
-                <span>Record ID: <code>{party.id}</code></span>
-                <span>{lastEdited ? `Last edited ${lastEdited}` : "Last-edited date not recorded"}</span>
+                <span>
+                  Record ID: <code>{party.id}</code>
+                </span>
+                <span>
+                  {lastEdited ? `Last edited ${lastEdited}` : "Last-edited date not recorded"}
+                </span>
               </div>
             </section>
           </div>
