@@ -25,6 +25,39 @@ export function getParty(id: string) {
   return parties.find((party) => party.id.toLowerCase() === id.toLowerCase());
 }
 
+const WIKI_LINK = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+
+/** IDs, die in party.relations per [[id]] verlinkt sind */
+export function extractRelationIds(relations: string | null | undefined): string[] {
+  if (!relations) return [];
+  const ids: string[] = [];
+  const seen = new Set<string>();
+  let match;
+  const re = new RegExp(WIKI_LINK.source, "g");
+  while ((match = re.exec(relations)) !== null) {
+    const id = match[1].trim();
+    const key = id.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
+/** Parteien, die in ihrem RELATIONS-Feld auf diese ID verlinken */
+export function getIncomingRelations(targetId: string) {
+  const key = targetId.toLowerCase();
+  return parties
+    .filter((party) => {
+      if (party.id.toLowerCase() === key) return false;
+      return extractRelationIds(party.relations).some(
+        (id) => id.toLowerCase() === key,
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "en"));
+}
+
 export function formatDate(value: string | null) {
   if (!value) return null;
   if (/^\d{4}$/.test(value)) return value;
