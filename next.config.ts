@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   output: githubPages ? "export" : undefined,
   basePath: githubPages ? "/ppdb" : "",
   env: {
-    NEXT_PUBLIC_BASE_PATH: githubPages ? "/ppdb" : "",
+    NEXT_PUBLIC_BASE_PATH: githubPages ? "" : "",
   },
   trailingSlash: githubPages,
   images: { unoptimized: true },
