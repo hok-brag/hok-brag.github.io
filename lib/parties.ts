@@ -50,6 +50,19 @@ export function extractRelationIds(text: string | null | undefined): string[] {
   return ids;
 }
 
+/** Einträge, die diese ID in MEMBERSHIPS führen (= Mitglieder) */
+export function getMemberParties(targetId: string) {
+  const key = targetId.toLowerCase();
+  return parties
+    .filter((party) => {
+      if (party.id.toLowerCase() === key) return false;
+      return extractRelationIds(party.memberships).some(
+        (id) => id.toLowerCase() === key,
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "en"));
+}
+
 export function formatDate(value: string | null) {
   if (!value) return null;
   if (/^\d{4}$/.test(value)) return value;
