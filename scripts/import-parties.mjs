@@ -24,6 +24,28 @@ const headers = (rows[1] ?? []).map((value) => String(value ?? "").trim());
 const index = Object.fromEntries(headers.map((header, column) => [header, column]));
 const valueAt = (row, key) => row[index[key]] ?? null;
 
+/** Erste vorhandene Spalte aus mehreren möglichen Headern */
+function valueAtAny(row, keys) {
+  for (const key of keys) {
+    if (index[key] != null) {
+      const value = valueAt(row, key);
+      if (value != null && String(value).trim() !== "") return value;
+    }
+  }
+  // auch leere, aber existierende Spalte erlauben
+  for (const key of keys) {
+    if (index[key] != null) return valueAt(row, key);
+  }
+  return null;
+}
+
+function headerKey(keys) {
+  for (const key of keys) {
+    if (index[key] != null) return key;
+  }
+  return keys[0];
+}
+
 function text(value) {
   const result = value == null ? "" : String(value).trim();
   return result || null;
@@ -164,6 +186,11 @@ function runsAt(rowNumber, key) {
   return formattedRuns(cellAt(sheet, rowNumber, index[key]), partyStyleIds.get(address) ?? 0);
 }
 
+function runsAtAny(rowNumber, keys) {
+  const key = headerKey(keys);
+  return runsAt(rowNumber, key);
+}
+
 function lineItemsAt(rowNumber, key, fallback = []) {
   const runs = runsAt(rowNumber, key);
   const lines = splitRunsByLines(runs).map((lineRuns) => ({
@@ -258,6 +285,8 @@ function dateValue(cell) {
   return null;
 }
 
+const MEMBERSHIP_HEADERS = ["MEMBERSHIPS", "Memberships", "memberships"];
+
 const legislatureSheet = workbook.Sheets.Legislatures;
 const legislatureRows = legislatureSheet
   ? XLSX.utils.sheet_to_json(legislatureSheet, { header: 1, raw: true, defval: null })
@@ -316,6 +345,7 @@ const parties = rows
 
     const labelItems = labelItemsAt(rowNumber);
     const typeItems = lineItemsAt(rowNumber, "TYPE", []);
+    const membershipKey = headerKey(MEMBERSHIP_HEADERS);
 
     return {
       country,
@@ -348,6 +378,7 @@ const parties = rows
       types: typeItems.map((item) => item.text),
       status: text(valueAt(row, "STATUS")),
       relations: text(valueAt(row, "RELATIONS")),
+      memberships: text(valueAtAny(row, MEMBERSHIP_HEADERS)),
       description: text(valueAt(row, "DESCRIPTION")),
       ideology: text(valueAt(row, "Ideology")) ?? text(valueAt(row, "IDEOLOGY")),
       leadership: text(valueAt(row, "LEADERSHIP")),
@@ -376,6 +407,7 @@ const parties = rows
         types: typeItems.map((item) => item.runs),
         status: runsAt(rowNumber, "STATUS"),
         relations: runsAt(rowNumber, "RELATIONS"),
+        memberships: runsAt(rowNumber, membershipKey),
         description: runsAt(rowNumber, "DESCRIPTION"),
         ideology: runsAt(rowNumber, index.Ideology == null ? "IDEOLOGY" : "Ideology"),
         leadership: runsAt(rowNumber, "LEADERSHIP"),
@@ -403,7 +435,7 @@ fs.writeFileSync(
   outputPath,
   `${JSON.stringify(
     {
-      schemaVersion: 6,
+      schemaVersion: 7,
       source: "data/PPDB database.xlsx",
       count: parties.length,
       parties,
