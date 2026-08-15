@@ -4,7 +4,13 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "../../components/SiteHeader";
 import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
-import { formatDate, getParty, parties } from "../../../lib/parties";
+import {
+  formatDate,
+  getMemberParties,
+  getParty,
+  parties,
+} from "../../../lib/parties";
+import { partyLinkLabel } from "../../../lib/wiki-links";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -89,12 +95,10 @@ export default async function PartyPage({ params }: PageProps) {
   const delegalised = formatDate(party.delegalised);
   const dissolved = formatDate(party.dissolved);
   const lastEdited = formatDate(party.lastEdited);
-  const memberships =
-    "memberships" in party ? (party as { memberships?: string | null }).memberships : null;
-  const membershipRuns =
-    "memberships" in (party.formatting ?? {})
-      ? (party.formatting as { memberships?: typeof party.formatting.relations }).memberships
-      : undefined;
+  const members = getMemberParties(party.id);
+  const membershipRuns = (
+    party.formatting as { memberships?: typeof party.formatting.relations }
+  ).memberships;
 
   const hasSeats = [
     party.seats.legislature,
@@ -250,11 +254,39 @@ export default async function PartyPage({ params }: PageProps) {
               </section>
             ) : null}
 
-            {memberships ? (
+            {party.memberships ? (
               <section className="relations-panel">
                 <h2>Memberships</h2>
                 <div className="relations-copy">
-                  <WikiText text={memberships} runs={membershipRuns} />
+                  <WikiText text={party.memberships} runs={membershipRuns} />
+                </div>
+              </section>
+            ) : null}
+
+            {members.length > 0 ? (
+              <section className="relations-panel">
+                <h2>Members</h2>
+                <div className="relations-copy">
+                  <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                    {members.map((other) => (
+                      <li key={other.id} style={{ marginBottom: "0.25rem" }}>
+                        <span className="party-inline-link">
+                          <span
+                            className="party-link-swatch"
+                            style={
+                              {
+                                "--party-link-color": other.color,
+                              } as React.CSSProperties
+                            }
+                            aria-hidden="true"
+                          />
+                          <Link href={`/party/${other.id}`}>
+                            {partyLinkLabel(other, other.id)}
+                          </Link>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </section>
             ) : null}
