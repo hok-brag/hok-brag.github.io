@@ -315,7 +315,7 @@ const parties = rows
     }
 
     const labelItems = labelItemsAt(rowNumber);
-    const typeItems = lineItemsAt(rowNumber, "TYPE", ["Party"]);
+    const typeItems = lineItemsAt(rowNumber, "TYPE", []);
 
     return {
       country,
