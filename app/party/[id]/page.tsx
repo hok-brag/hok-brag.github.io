@@ -6,6 +6,7 @@ import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
 import {
   formatDate,
+  getIncomingRelationParties,
   getMemberParties,
   getParty,
   parties,
@@ -96,6 +97,7 @@ export default async function PartyPage({ params }: PageProps) {
   const dissolved = formatDate(party.dissolved);
   const lastEdited = formatDate(party.lastEdited);
   const members = getMemberParties(party.id);
+  const incomingRelations = getIncomingRelationParties(party.id);
   const membershipRuns = (
     party.formatting as { memberships?: typeof party.formatting.relations }
   ).memberships;
@@ -245,12 +247,41 @@ export default async function PartyPage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {party.relations ? (
+            {party.relations || incomingRelations.length > 0 ? (
               <section className="relations-panel">
                 <h2>Relations</h2>
-                <div className="relations-copy">
-                  <WikiText text={party.relations} runs={party.formatting.relations} />
-                </div>
+                {party.relations ? (
+                  <div className="relations-copy">
+                    <WikiText text={party.relations} runs={party.formatting.relations} />
+                  </div>
+                ) : null}
+                {incomingRelations.length > 0 ? (
+                  <div
+                    className="relations-copy"
+                    style={{ marginTop: party.relations ? "0.35rem" : 0 }}
+                  >
+                    <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                      {incomingRelations.map((other) => (
+                        <li key={other.id} style={{ marginBottom: "0.25rem" }}>
+                          <span className="party-inline-link">
+                            <span
+                              className="party-link-swatch"
+                              style={
+                                {
+                                  "--party-link-color": other.color,
+                                } as React.CSSProperties
+                              }
+                              aria-hidden="true"
+                            />
+                            <Link href={`/party/${other.id}`}>
+                              {partyLinkLabel(other, other.id)}
+                            </Link>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </section>
             ) : null}
 
