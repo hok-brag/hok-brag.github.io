@@ -4,13 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "../../components/SiteHeader";
 import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
-import {
-  formatDate,
-  getIncomingRelations,
-  getParty,
-  parties,
-} from "../../../lib/parties";
-import { partyLinkLabel } from "../../../lib/wiki-links";
+import { formatDate, getParty, parties } from "../../../lib/parties";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -95,13 +89,20 @@ export default async function PartyPage({ params }: PageProps) {
   const delegalised = formatDate(party.delegalised);
   const dissolved = formatDate(party.dissolved);
   const lastEdited = formatDate(party.lastEdited);
-  const incoming = getIncomingRelations(party.id);
+  const memberships =
+    "memberships" in party ? (party as { memberships?: string | null }).memberships : null;
+  const membershipRuns =
+    "memberships" in (party.formatting ?? {})
+      ? (party.formatting as { memberships?: typeof party.formatting.relations }).memberships
+      : undefined;
+
   const hasSeats = [
     party.seats.legislature,
     party.seats.lowerHouse,
     party.seats.upperHouse,
     party.seats.mep,
   ].some((value) => value != null);
+
   const externalLinks = [
     { label: "Website", href: party.website, text: "Official website" },
     { label: "Archived website", href: party.archivedWebsite, text: "Archived website" },
@@ -240,35 +241,21 @@ export default async function PartyPage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {party.relations || incoming.length > 0 ? (
+            {party.relations ? (
               <section className="relations-panel">
                 <h2>Relations</h2>
-                {party.relations ? (
-                  <div className="relations-copy">
-                    <WikiText text={party.relations} runs={party.formatting.relations} />
-                  </div>
-                ) : null}
-                {incoming.length > 0 ? (
-                  <div
-                    className="relations-copy"
-                    style={{ marginTop: party.relations ? "0.75rem" : 0 }}
-                  >
-                    {party.relations ? (
-                      <p style={{ margin: "0 0 0.35rem", fontSize: "0.85em", opacity: 0.75 }}>
-                        Also linked from
-                      </p>
-                    ) : null}
-                    <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
-                      {incoming.map((other) => (
-                        <li key={other.id}>
-                          <Link href={`/party/${other.id}`}>
-                            {partyLinkLabel(other, other.id)}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
+                <div className="relations-copy">
+                  <WikiText text={party.relations} runs={party.formatting.relations} />
+                </div>
+              </section>
+            ) : null}
+
+            {memberships ? (
+              <section className="relations-panel">
+                <h2>Memberships</h2>
+                <div className="relations-copy">
+                  <WikiText text={memberships} runs={membershipRuns} />
+                </div>
               </section>
             ) : null}
           </aside>
