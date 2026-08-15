@@ -63,6 +63,25 @@ export function getMemberParties(targetId: string) {
     .sort((a, b) => a.name.localeCompare(b.name, "en"));
 }
 
+/** Parteien, die in RELATIONS auf targetId zeigen (Gegenseitigkeit) */
+export function getIncomingRelationParties(targetId: string) {
+  const target = getParty(targetId);
+  const key = targetId.toLowerCase();
+  const alreadyListed = new Set(
+    extractRelationIds(target?.relations).map((id) => id.toLowerCase()),
+  );
+
+  return parties
+    .filter((party) => {
+      if (party.id.toLowerCase() === key) return false;
+      if (alreadyListed.has(party.id.toLowerCase())) return false;
+      return extractRelationIds(party.relations).some(
+        (id) => id.toLowerCase() === key,
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "en"));
+}
+
 export function formatDate(value: string | null) {
   if (!value) return null;
   if (/^\d{4}$/.test(value)) return value;
