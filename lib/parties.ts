@@ -5,8 +5,12 @@ export type FormerLogo = {
   until: string | null;
 };
 
-export type Party = Omit<(typeof database.parties)[number], "formerLogos"> & {
+export type Party = Omit<
+  (typeof database.parties)[number],
+  "formerLogos" | "types"
+> & {
   formerLogos: FormerLogo[];
+  types: string[];
 };
 
 export type RichTextRun = {
