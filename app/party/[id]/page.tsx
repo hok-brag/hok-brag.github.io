@@ -6,6 +6,7 @@ import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
 import {
   formatDate,
+  formatLifeSpan,
   getIncomingRelationParties,
   getMemberParties,
   getParty,
@@ -299,24 +300,38 @@ export default async function PartyPage({ params }: PageProps) {
                 <h2>Members</h2>
                 <div className="relations-copy">
                   <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                    {members.map((other) => (
-                      <li key={other.id} style={{ marginBottom: "0.25rem" }}>
-                        <span className="party-inline-link">
-                          <span
-                            className="party-link-swatch"
-                            style={
-                              {
-                                "--party-link-color": other.color,
-                              } as React.CSSProperties
-                            }
-                            aria-hidden="true"
-                          />
-                          <Link href={`/party/${other.id}`}>
-                            {partyLinkLabel(other, other.id)}
-                          </Link>
-                        </span>
-                      </li>
-                    ))}
+                    {members.map((other) => {
+                      const lifeSpan = formatLifeSpan(other.established, other.dissolved);
+                      return (
+                        <li key={other.id} style={{ marginBottom: "0.25rem" }}>
+                          <span className="party-inline-link">
+                            <span
+                              className="party-link-swatch"
+                              style={
+                                {
+                                  "--party-link-color": other.color,
+                                } as React.CSSProperties
+                              }
+                              aria-hidden="true"
+                            />
+                            <Link href={`/party/${other.id}`}>
+                              {partyLinkLabel(other, other.id)}
+                            </Link>
+                            {lifeSpan ? (
+                              <span
+                                style={{
+                                  marginLeft: "0.35em",
+                                  opacity: 0.7,
+                                  fontSize: "0.9em",
+                                }}
+                              >
+                                {lifeSpan}
+                              </span>
+                            ) : null}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </section>
