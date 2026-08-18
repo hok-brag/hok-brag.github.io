@@ -40,12 +40,13 @@ export default function Home() {
 
         <PartyDirectory countries={countries} parties={parties} />
       </div>
-      <footer>
-        <span>PPDB — Political Parties Database</span>
-        <span>
-          PPDB is not a reliable source. Any data from PPDB is provided for reference <strong>should
-          not</strong> be used for serious purposes. The website structure was vibecoded using
-          ChatGPT. All entries were added by humans.
+     <footer>
+  <span>CCDB — Church Communion Database</span>
+    <span>
+        CCDB is not a reliable source. Any data from CCDB is provided for reference{" "}
+        <strong>should not</strong> be used for serious purposes. The website
+         structure was vibecoded using ChatGPT and Grok. All entries were added by
+          humans.
         </span>
       </footer>
     </main>
