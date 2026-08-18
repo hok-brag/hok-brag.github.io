@@ -11,9 +11,9 @@ export function SiteHeader() {
           <Link className="brand" href="/">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${basePath}/branding/PPDB.png`} alt="PPDB logo" />
-            <span>Political Parties Database</span>
+            <span>Church Communion Database</span>
           </Link>
-          <p>Open-source database of political parties worldwide.</p>
+          <p>Open-source database of church unions worldwide.</p>
         </div>
         <ThemeButton />
       </header>
