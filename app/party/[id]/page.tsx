@@ -24,8 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const party = getParty(id);
   return party
-    ? { title: `${party.name} — PPDB`, description: `${party.name}, ${party.country}: PPDB record.` }
-    : { title: "Party not found — PPDB" };
+    ? {
+        title: `${party.name} — Church Communion Database`,
+        description: `${party.name}, ${party.country}: Church Communion Database record.`,
+      }
+    : { title: "Record not found — Church Communion Database" };
 }
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -144,7 +147,7 @@ export default async function PartyPage({ params }: PageProps) {
             />
           </div>
           <div>
-            <span className="eyebrow">Party record / {party.id}</span>
+            <span className="eyebrow">Record / {party.id}</span>
             <div className="record-context">
               <Link href={`/?country=${encodeURIComponent(party.country)}`}>
                 <RichText text={party.country} runs={party.formatting.country} />
@@ -191,7 +194,7 @@ export default async function PartyPage({ params }: PageProps) {
 
         <div className="record-layout">
           <aside className="panel infobox">
-            <div className="section-label">Party details</div>
+            <div className="section-label">Details</div>
             <dl>
               {party.acronym ? (
                 <InfoRow label="Acronym">
@@ -423,7 +426,7 @@ export default async function PartyPage({ params }: PageProps) {
       </div>
       <footer>
         <Link href="/">← Return to index page</Link>
-        <span>PPDB — Political Parties Database</span>
+        <span>Church Communion Database</span>
       </footer>
     </main>
   );
