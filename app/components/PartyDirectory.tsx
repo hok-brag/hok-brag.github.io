@@ -306,3 +306,228 @@ export function PartyDirectory({ countries, parties }: Props) {
             value={country}
             onChange={(event) => {
               updateUrlFilters({ country: event.target.value });
+            }}
+          >
+            <option value="all">All countries</option>
+            {countries.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Type</span>
+          <select
+            value={type}
+            onChange={(event) => {
+              updateUrlFilters({ type: event.target.value });
+            }}
+          >
+            <option value="all">All types</option>
+            {types.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Status</span>
+          <select
+            value={status}
+            onChange={(event) => {
+              updateUrlFilters({ status: event.target.value });
+            }}
+          >
+            <option value="all">All statuses</option>
+            {statuses.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Label</span>
+          <select value={activeLabel} onChange={(event) => chooseLabel(event.target.value)}>
+            <option value="">All labels</option>
+            {classificationLabels.map((item) => (
+              <option key={`label-${item}`} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Sort</span>
+          <select value={sort} onChange={(event) => setSort(event.target.value)}>
+            <option value="name">Name A–Z</option>
+            <option value="country">Country A–Z</option>
+            <option value="status">Status A–Z</option>
+            <option value="label">First label A–Z</option>
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </label>
+        <div className="view-switch" aria-label="Display style">
+          <button
+            type="button"
+            className={view === "cards" ? "active" : ""}
+            onClick={() => setView("cards")}
+          >
+            Cards
+          </button>
+          <button
+            type="button"
+            className={view === "rows" ? "active" : ""}
+            onClick={() => setView("rows")}
+          >
+            Rows
+          </button>
+        </div>
+      </div>
+      {visible.length ? (
+        <>
+          <div ref={gridRef} className={`party-grid ${view === "rows" ? "row-view" : ""}`}>
+            {renderedParties.map((party) => (
+              <article
+                className="party-card"
+                key={party.id}
+                style={{ "--party-color": party.color } as React.CSSProperties}
+              >
+                <div className="card-link">
+                  <div className="party-card-media">
+                    <Link
+                      className="party-logo-wrap"
+                      href={`/party/${party.id}`}
+                      aria-label={`View ${party.name}`}
+                    >
+                      <LogoImage
+                        src={party.logo}
+                        alt=""
+                        className="party-logo"
+                        fallback={party.acronym ?? party.name.slice(0, 2)}
+                        fallbackClassName="logo-placeholder"
+                      />
+                    </Link>
+                    <Link className="open-record" href={`/party/${party.id}`}>
+                      Open record →
+                    </Link>
+                  </div>
+                  <div className="party-card-copy">
+                    <h2>
+                      <Link href={`/party/${party.id}`}>
+                        <RichText text={party.name} runs={party.formatting.name} />
+                      </Link>
+                    </h2>
+                    {party.nativeName && party.nativeName !== party.name ? (
+                      <p className="native-party-name">
+                        <RichText text={party.nativeName} runs={party.formatting.nativeName} />
+                      </p>
+                    ) : null}
+                    {party.literalName ? (
+                      <p className="literal-party-name">
+                        (<RichText text={party.literalName} runs={party.formatting.literalName} />)
+                      </p>
+                    ) : null}
+                    <div className="party-meta">
+                      {party.acronym ? (
+                        <span>
+                          <RichText text={party.acronym} runs={party.formatting.acronym} />
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="context-filter-list">
+                      <button type="button" onClick={() => chooseCountry(party.country)}>
+                        <RichText text={party.country} runs={party.formatting.country} />
+                      </button>
+                      {party.types.map((item, typeIndex) => (
+                        <button type="button" key={item} onClick={() => chooseType(item)}>
+                          <RichText text={item} runs={party.formatting.types[typeIndex]} />
+                        </button>
+                      ))}
+                      {party.status ? (
+                        <button type="button" onClick={() => chooseStatus(party.status!)}>
+                          <RichText text={party.status} runs={party.formatting.status} />
+                        </button>
+                      ) : null}
+                    </div>
+                    <div className="label-list">
+                      {party.labelDetails
+                        .filter((label) => label.indexVisible)
+                        .map((label) => (
+                          <button
+                            type="button"
+                            key={label.name}
+                            onClick={() => chooseLabel(label.name)}
+                          >
+                            <RichText text={label.display} runs={label.runs} />
+                          </button>
+                        ))}
+                    </div>
+                    <div className="seat-line">
+                      {party.dissolved && formatLifeSpan(party.established, party.dissolved) ? (
+                        <span>
+                          <b>{formatLifeSpan(party.established, party.dissolved)}</b>
+                        </span>
+                      ) : (
+                        <>
+                          <SeatValue
+                            label={party.seats.legislatureName}
+                            value={party.seats.legislature}
+                            total={party.seats.legislatureTotal}
+                          />
+                          <SeatValue
+                            label={party.seats.lowerHouseName}
+                            value={party.seats.lowerHouse}
+                            total={party.seats.lowerHouseTotal}
+                          />
+                          <SeatValue
+                            label={party.seats.upperHouseName}
+                            value={party.seats.upperHouse}
+                            total={party.seats.upperHouseTotal}
+                          />
+                          <SeatValue
+                            label="MEPs"
+                            value={party.seats.mep}
+                            total={party.seats.mepTotal}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          {hasMore ? (
+            <div className="directory-load-more" ref={loadMoreRef}>
+              <button
+                type="button"
+                onClick={() =>
+                  setPagination((current) => ({
+                    key: paginationKey,
+                    limit: Math.min(
+                      (current.key === paginationKey ? current.limit : INDEX_PAGE_SIZE) +
+                        INDEX_PAGE_SIZE,
+                      visible.length,
+                    ),
+                  }))
+                }
+              >
+                Load next {Math.min(INDEX_PAGE_SIZE, visible.length - renderedParties.length)}{" "}
+                entries
+              </button>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div className="empty-state">
+          <strong>No matching records.</strong>
+          <span>Try a broader search or reset one of the filters.</span>
+        </div>
+      )}
+    </section>
+  );
+}
