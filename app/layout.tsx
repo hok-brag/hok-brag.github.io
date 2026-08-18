@@ -4,7 +4,7 @@ import "./globals.css";
 const assetPrefix = process.env.GITHUB_PAGES === "true" ? "/ppdb" : "";
 
 export const metadata: Metadata = {
-  title: "Church Communion Databas",
+  title: "Church Communion Database",
   description: "Open-source database of church union worldwide.",
   other: {
     "codex-preview": "development",
