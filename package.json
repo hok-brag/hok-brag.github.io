@@ -43,5 +43,5 @@
     "xlsx": "^0.18.5"
   },
   "type": "module",
-  "displayName": "Political Parties Database"
+    "displayName": "Church Union Database"
 }
