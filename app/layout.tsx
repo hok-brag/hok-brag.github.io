@@ -5,7 +5,7 @@ const assetPrefix = process.env.GITHUB_PAGES === "true" ? "/ppdb" : "";
 
 export const metadata: Metadata = {
   title: "Church Communion Database",
-  description: "Open-source database of church union worldwide.",
+  description: "Open-source database of church unions worldwide.",
   other: {
     "codex-preview": "development",
   },
