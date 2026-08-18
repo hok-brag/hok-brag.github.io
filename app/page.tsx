@@ -28,7 +28,7 @@ export default function Home() {
       <div className="page-body">
         <section className="intro-strip" id="about">
           <div>
-            <span className="eyebrow">PPDB / Index</span>
+            <span className="eyebrow">CCDB / Index</span>
             <h1>Explore parties from all over the world, without borders.</h1>
           </div>
           <p>
