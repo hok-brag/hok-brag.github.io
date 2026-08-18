@@ -4,8 +4,8 @@ import "./globals.css";
 const assetPrefix = process.env.GITHUB_PAGES === "true" ? "/ppdb" : "";
 
 export const metadata: Metadata = {
-  title: "Political Parties Database",
-  description: "Open-source database of political parties worldwide.",
+  title: "Church Communion Databas",
+  description: "Open-source database of church union worldwide.",
   other: {
     "codex-preview": "development",
   },
