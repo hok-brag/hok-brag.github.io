@@ -3,6 +3,10 @@ import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { getParty, type RichTextRun } from "../../lib/parties";
 import { partyLinkLabel } from "../../lib/wiki-links";
 
+const PPDB_BASE = "https://platelru.github.io/ppdb";
+/** Neutrale Farbe für externe PPDB-Links */
+const PPDB_SWATCH = "#1e3a5f";
+
 function InlineWikiText({ text }: { text: string }) {
   const pattern = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
   const parts: ReactNode[] = [];
@@ -13,11 +17,34 @@ function InlineWikiText({ text }: { text: string }) {
     if (match.index > cursor) parts.push(text.slice(cursor, match.index));
     const [, rawId, label] = match;
     const id = rawId.trim();
+    const key = `${id}-${match.index}`;
+
+    const ppdbMatch = /^(?:ppdb|platel):(.+)$/i.exec(id);
+    if (ppdbMatch) {
+      const externalId = ppdbMatch[1].trim();
+      const displayLabel = label?.trim() || externalId;
+      const href = `${PPDB_BASE}/party/${encodeURIComponent(externalId)}/`;
+      parts.push(
+        <span className="party-inline-link" key={key}>
+          <span
+            className="party-link-swatch"
+            style={{ "--party-link-color": PPDB_SWATCH } as CSSProperties}
+            aria-hidden="true"
+          />
+          <a href={href} target="_blank" rel="noreferrer">
+            {displayLabel}
+          </a>
+        </span>,
+      );
+      cursor = pattern.lastIndex;
+      continue;
+    }
+
     const linkedParty = getParty(id);
     const displayLabel = partyLinkLabel(linkedParty, id, label);
     parts.push(
       linkedParty ? (
-        <span className="party-inline-link" key={`${id}-${match.index}`}>
+        <span className="party-inline-link" key={key}>
           <span
             className="party-link-swatch"
             style={{ "--party-link-color": linkedParty.color } as CSSProperties}
@@ -29,8 +56,8 @@ function InlineWikiText({ text }: { text: string }) {
         <Link
           className="missing-party-link"
           href={`/party/${encodeURIComponent(id)}`}
-          key={`${id}-${match.index}`}
-          title={`No PPDB record for ${id}`}
+          key={key}
+          title={`No record for ${id}`}
         >
           {displayLabel}
         </Link>
@@ -85,7 +112,9 @@ export function RichText({
 
   return paragraphRuns(contentRuns).map((paragraph, paragraphIndex) => (
     <p key={paragraphIndex}>
-      {paragraph.map((run, runIndex) => <StyledRun key={runIndex} run={run} />)}
+      {paragraph.map((run, runIndex) => (
+        <StyledRun key={runIndex} run={run} />
+      ))}
     </p>
   ));
 }
