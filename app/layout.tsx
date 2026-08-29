@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const assetPrefix = process.env.GITHUB_PAGES === "true" ? "/ppdb" : "";
+// Root-Deployment auf hok-brag.github.io (kein /ppdb-Unterpfad)
+const assetPrefix = "";
 
 export const metadata: Metadata = {
   title: "Church Communion Database",
