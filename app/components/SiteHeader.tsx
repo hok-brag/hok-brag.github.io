@@ -22,7 +22,7 @@ export function SiteHeader() {
         <Link href="/#about">About</Link>
         <Link href="/data-guide">Data guide</Link>
         <a
-          href="https://github.com/PLATELru/ppdb/blob/main/data/PPDB%20database.xlsx"
+          href="https://github.com/hok-brag/hok-brag.github.io/blob/main/data/PPDB%20database.xlsx"
           target="_blank"
           rel="noreferrer"
         >
