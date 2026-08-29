@@ -42,13 +42,27 @@ export default function Home() {
       </div>
      <footer>
   <span>CCDB — Church Communion Database</span>
-    <span>
-        CCDB is not a reliable source. Any data from CCDB is provided for reference{" "}
-        <strong>should not</strong> be used for serious purposes. The website
-         structure was vibecoded using ChatGPT and Grok. All entries were added by
-          humans.
-        </span>
-      </footer>
+  <span>
+    CCDB is not a reliable source. Any data from CCDB is provided for reference{" "}
+    <strong>should not</strong> be used for serious purposes. The website
+    structure was vibecoded using ChatGPT and Grok. All entries were added by
+    humans.
+    <br />
+    Compatible with{" "}
+    <a href="https://platelru.github.io/ppdb/" target="_blank" rel="noreferrer">
+      Political Parties Database
+    </a>{" "}
+    and{" "}
+    <a
+      href="https://bananasareviolet.github.io/epgroupbuilder/"
+      target="_blank"
+      rel="noreferrer"
+    >
+      EP Group Builder
+    </a>
+    .
+  </span>
+</footer>
     </main>
   );
 }
