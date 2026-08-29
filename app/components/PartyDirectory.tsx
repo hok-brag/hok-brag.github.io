@@ -79,12 +79,19 @@ function updateUrlFilters(filters: {
   window.dispatchEvent(new Event("ppdb-filter-change"));
 }
 
+function escapeCsv(value: string) {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
 export function PartyDirectory({ countries, parties }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("name");
   const [view, setView] = useState<"cards" | "rows">("cards");
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+
   const activeLabel = useSyncExternalStore(subscribeToUrlFilters, getUrlLabel, () => "");
   const country = useSyncExternalStore(subscribeToUrlFilters, getUrlCountry, () => "all");
   const type = useSyncExternalStore(subscribeToUrlFilters, getUrlType, () => "all");
@@ -147,6 +154,55 @@ export function PartyDirectory({ countries, parties }: Props) {
     setQuery("");
     updateUrlFilters({ status: value });
     document.getElementById("party-index-heading")?.scrollIntoView({ block: "start" });
+  }
+
+  function toggleSelected(id: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+  }
+
+  function exportSelected() {
+    const rows = parties.filter((party) => selectedIds.has(party.id));
+    if (!rows.length) return;
+
+    const siteOrigin =
+      typeof window !== "undefined" ? window.location.origin : "https://hok-brag.github.io";
+
+    const lines = [
+      ["NAME", "EPSEAT", "COUNTRY", "ACRONYM", "LOGO", "COLOUR"].join(","),
+      ...rows.map((party) => {
+        const logo =
+          party.logo?.startsWith("http")
+            ? party.logo
+            : party.logo
+              ? `${siteOrigin}${party.logo.startsWith("/") ? "" : "/"}${party.logo}`
+              : "";
+        return [
+          escapeCsv(party.name),
+          "1",
+          escapeCsv(party.country ?? ""),
+          escapeCsv(party.acronym ?? ""),
+          escapeCsv(logo),
+          escapeCsv(party.color ?? ""),
+        ].join(",");
+      }),
+    ];
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "ccdb-epgroup-export.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   const visible = useMemo(() => {
@@ -277,7 +333,7 @@ export function PartyDirectory({ countries, parties }: Props) {
       resizeObserver.disconnect();
       cards.forEach((card) => card.style.removeProperty("grid-row-end"));
     };
-  }, [renderedParties, view]);
+  }, [renderedParties, view, selectMode, selectedIds]);
 
   return (
     <section className="panel directory-panel" aria-labelledby="party-index-heading">
@@ -288,7 +344,34 @@ export function PartyDirectory({ countries, parties }: Props) {
         <div>
           <strong>{visible.length}</strong> of {parties.length} party records
         </div>
-        <div>{countries.length} countries represented</div>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.6rem" }}>
+          <span>{countries.length} countries represented</span>
+          <button
+            type="button"
+            className={selectMode ? "active" : ""}
+            onClick={() => {
+              if (selectMode) {
+                setSelectMode(false);
+                clearSelection();
+              } else {
+                setSelectMode(true);
+              }
+            }}
+          >
+            {selectMode ? "Done selecting" : "Select for export"}
+          </button>
+          {selectMode && selectedIds.size > 0 ? (
+            <>
+              <span>{selectedIds.size} selected</span>
+              <button type="button" onClick={exportSelected}>
+                Export spreadsheet
+              </button>
+              <button type="button" onClick={clearSelection}>
+                Clear
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
       <div className="toolbar">
         <label className="search-field">
@@ -390,116 +473,133 @@ export function PartyDirectory({ countries, parties }: Props) {
       {visible.length ? (
         <>
           <div ref={gridRef} className={`party-grid ${view === "rows" ? "row-view" : ""}`}>
-            {renderedParties.map((party) => (
-              <article
-                className="party-card"
-                key={party.id}
-                style={{ "--party-color": party.color } as React.CSSProperties}
-              >
-                <div className="card-link">
-                  <div className="party-card-media">
-                    <Link
-                      className="party-logo-wrap"
-                      href={`/party/${party.id}`}
-                      aria-label={`View ${party.name}`}
-                    >
-                      <LogoImage
-                        src={party.logo}
-                        alt=""
-                        className="party-logo"
-                        fallback={party.acronym ?? party.name.slice(0, 2)}
-                        fallbackClassName="logo-placeholder"
-                      />
-                    </Link>
-                    <Link className="open-record" href={`/party/${party.id}`}>
-                      Open record →
-                    </Link>
-                  </div>
-                  <div className="party-card-copy">
-                    <h2>
-                      <Link href={`/party/${party.id}`}>
-                        <RichText text={party.name} runs={party.formatting.name} />
+            {renderedParties.map((party) => {
+              const isSelected = selectedIds.has(party.id);
+              return (
+                <article
+                  className={`party-card${isSelected ? " is-selected" : ""}`}
+                  key={party.id}
+                  style={{ "--party-color": party.color } as React.CSSProperties}
+                >
+                  <div className="card-link">
+                    <div className="party-card-media">
+                      <Link
+                        className="party-logo-wrap"
+                        href={`/party/${party.id}`}
+                        aria-label={`View ${party.name}`}
+                      >
+                        <LogoImage
+                          src={party.logo}
+                          alt=""
+                          className="party-logo"
+                          fallback={party.acronym ?? party.name.slice(0, 2)}
+                          fallbackClassName="logo-placeholder"
+                        />
                       </Link>
-                    </h2>
-                    {party.nativeName && party.nativeName !== party.name ? (
-                      <p className="native-party-name">
-                        <RichText text={party.nativeName} runs={party.formatting.nativeName} />
-                      </p>
-                    ) : null}
-                    {party.literalName ? (
-                      <p className="literal-party-name">
-                        (<RichText text={party.literalName} runs={party.formatting.literalName} />)
-                      </p>
-                    ) : null}
-                    <div className="party-meta">
-                      {party.acronym ? (
-                        <span>
-                          <RichText text={party.acronym} runs={party.formatting.acronym} />
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="context-filter-list">
-                      <button type="button" onClick={() => chooseCountry(party.country)}>
-                        <RichText text={party.country} runs={party.formatting.country} />
-                      </button>
-                      {party.types.map((item, typeIndex) => (
-                        <button type="button" key={item} onClick={() => chooseType(item)}>
-                          <RichText text={item} runs={party.formatting.types[typeIndex]} />
-                        </button>
-                      ))}
-                      {party.status ? (
-                        <button type="button" onClick={() => chooseStatus(party.status!)}>
-                          <RichText text={party.status} runs={party.formatting.status} />
+                      <Link className="open-record" href={`/party/${party.id}`}>
+                        Open record →
+                      </Link>
+                      {selectMode ? (
+                        <button
+                          type="button"
+                          className="select-party-btn"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            toggleSelected(party.id);
+                          }}
+                        >
+                          {isSelected ? "Selected ✓" : "Select"}
                         </button>
                       ) : null}
                     </div>
-                    <div className="label-list">
-                      {party.labelDetails
-                        .filter((label) => label.indexVisible)
-                        .map((label) => (
-                          <button
-                            type="button"
-                            key={label.name}
-                            onClick={() => chooseLabel(label.name)}
-                          >
-                            <RichText text={label.display} runs={label.runs} />
+                    <div className="party-card-copy">
+                      <h2>
+                        <Link href={`/party/${party.id}`}>
+                          <RichText text={party.name} runs={party.formatting.name} />
+                        </Link>
+                      </h2>
+                      {party.nativeName && party.nativeName !== party.name ? (
+                        <p className="native-party-name">
+                          <RichText text={party.nativeName} runs={party.formatting.nativeName} />
+                        </p>
+                      ) : null}
+                      {party.literalName ? (
+                        <p className="literal-party-name">
+                          (
+                          <RichText text={party.literalName} runs={party.formatting.literalName} />)
+                        </p>
+                      ) : null}
+                      <div className="party-meta">
+                        {party.acronym ? (
+                          <span>
+                            <RichText text={party.acronym} runs={party.formatting.acronym} />
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="context-filter-list">
+                        <button type="button" onClick={() => chooseCountry(party.country)}>
+                          <RichText text={party.country} runs={party.formatting.country} />
+                        </button>
+                        {party.types.map((item, typeIndex) => (
+                          <button type="button" key={item} onClick={() => chooseType(item)}>
+                            <RichText text={item} runs={party.formatting.types[typeIndex]} />
                           </button>
                         ))}
-                    </div>
-                    <div className="seat-line">
-                      {party.dissolved && formatLifeSpan(party.established, party.dissolved) ? (
-                        <span>
-                          <b>{formatLifeSpan(party.established, party.dissolved)}</b>
-                        </span>
-                      ) : (
-                        <>
-                          <SeatValue
-                            label={party.seats.legislatureName}
-                            value={party.seats.legislature}
-                            total={party.seats.legislatureTotal}
-                          />
-                          <SeatValue
-                            label={party.seats.lowerHouseName}
-                            value={party.seats.lowerHouse}
-                            total={party.seats.lowerHouseTotal}
-                          />
-                          <SeatValue
-                            label={party.seats.upperHouseName}
-                            value={party.seats.upperHouse}
-                            total={party.seats.upperHouseTotal}
-                          />
-                          <SeatValue
-                            label="MEPs"
-                            value={party.seats.mep}
-                            total={party.seats.mepTotal}
-                          />
-                        </>
-                      )}
+                        {party.status ? (
+                          <button type="button" onClick={() => chooseStatus(party.status!)}>
+                            <RichText text={party.status} runs={party.formatting.status} />
+                          </button>
+                        ) : null}
+                      </div>
+                      <div className="label-list">
+                        {party.labelDetails
+                          .filter((label) => label.indexVisible)
+                          .map((label) => (
+                            <button
+                              type="button"
+                              key={label.name}
+                              onClick={() => chooseLabel(label.name)}
+                            >
+                              <RichText text={label.display} runs={label.runs} />
+                            </button>
+                          ))}
+                      </div>
+                      <div className="seat-line">
+                        {party.dissolved && formatLifeSpan(party.established, party.dissolved) ? (
+                          <span>
+                            <b>{formatLifeSpan(party.established, party.dissolved)}</b>
+                          </span>
+                        ) : (
+                          <>
+                            <SeatValue
+                              label={party.seats.legislatureName}
+                              value={party.seats.legislature}
+                              total={party.seats.legislatureTotal}
+                            />
+                            <SeatValue
+                              label={party.seats.lowerHouseName}
+                              value={party.seats.lowerHouse}
+                              total={party.seats.lowerHouseTotal}
+                            />
+                            <SeatValue
+                              label={party.seats.upperHouseName}
+                              value={party.seats.upperHouse}
+                              total={party.seats.upperHouseTotal}
+                            />
+                            <SeatValue
+                              label="MEPs"
+                              value={party.seats.mep}
+                              total={party.seats.mepTotal}
+                            />
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
           {hasMore ? (
             <div className="directory-load-more" ref={loadMoreRef}>
