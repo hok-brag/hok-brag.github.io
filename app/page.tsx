@@ -29,7 +29,7 @@ export default function Home() {
         <section className="intro-strip" id="about">
           <div>
             <span className="eyebrow">CCDB / Index</span>
-            <h1>Explore parties from all over the world, without borders.</h1>
+            <h1>Explore denominations from all over the world, without borders.</h1>
           </div>
           <p>
             This project is not a reliable source of information and was created by a single
