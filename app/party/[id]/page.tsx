@@ -5,6 +5,7 @@ import { SiteHeader } from "../../components/SiteHeader";
 import { LogoImage } from "../../components/LogoImage";
 import { RichText, WikiText } from "../../components/WikiText";
 import {
+  decoGifFor,
   formatDate,
   formatLifeSpan,
   getIncomingRelationParties,
@@ -426,7 +427,7 @@ export default async function PartyPage({ params }: PageProps) {
 
         <div className="directory-deco" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/branding/church-trees.gif" alt="" />
+          <img src={decoGifFor(party)} alt="" />
         </div>
       </div>
       <footer>
