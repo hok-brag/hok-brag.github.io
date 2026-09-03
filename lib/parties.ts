@@ -88,6 +88,7 @@ export function decoGifFor(party: {
 }): string {
   const hay = [...party.types, ...party.labels].join(" ").toLowerCase();
   if (hay.includes("methodist")) return "/branding/deco-methodist.gif";
+  if (hay.includes("lutheran")) return "/branding/deco-lutheran.gif";
 return "/branding/church-trees.gif";
 }
 
