@@ -124,7 +124,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   height: 56px;
   flex: 0 0 auto;
   border: 1px solid #fff;
-  image-rendering: pixelated;
+  object-fit: contain;
+  image-rendering: auto;
 }
 
 .site-header p {
@@ -562,6 +563,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   background: var(--panel-light);
   border: 1px solid var(--line);
   text-align: center;
+}
+
+.directory-deco {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  padding: 8px 0 4px;
+}
+
+.directory-deco img {
+  display: block;
+  max-width: min(320px, 100%);
+  height: auto;
+  image-rendering: auto;
 }
 
 .notes-panel { margin-top: 12px; }
