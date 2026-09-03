@@ -601,7 +601,7 @@ export function PartyDirectory({ countries, parties }: Props) {
               );
             })}
           </div>
-          {hasMore ? (
+                   {hasMore ? (
             <div className="directory-load-more" ref={loadMoreRef}>
               <button
                 type="button"
@@ -628,6 +628,14 @@ export function PartyDirectory({ countries, parties }: Props) {
           <span>Try a broader search or reset one of the filters.</span>
         </div>
       )}
+
+      <div className="directory-deco" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/branding/church-trees.gif`}
+          alt=""
+        />
+      </div>
     </section>
   );
 }
