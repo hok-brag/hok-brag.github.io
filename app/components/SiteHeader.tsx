@@ -15,7 +15,16 @@ export function SiteHeader() {
           </Link>
           <p>Open-source database of church unions worldwide.</p>
         </div>
-        <ThemeButton />
+        <div className="site-header-right">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="header-dove"
+            src={`${basePath}/branding/dove5.gif`}
+            alt=""
+            aria-hidden="true"
+          />
+          <ThemeButton />
+        </div>
       </header>
       <nav className="main-nav" aria-label="Primary navigation">
         <Link href="/">Index</Link>
