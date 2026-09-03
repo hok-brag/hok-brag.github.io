@@ -70,7 +70,6 @@ export function getIncomingRelationParties(targetId: string) {
   const alreadyListed = new Set(
     extractRelationIds(target?.relations).map((id) => id.toLowerCase()),
   );
-
   return parties
     .filter((party) => {
       if (party.id.toLowerCase() === key) return false;
@@ -82,10 +81,19 @@ export function getIncomingRelationParties(targetId: string) {
     .sort((a, b) => a.name.localeCompare(b.name, "en"));
 }
 
+/** Deko-GIF je nach Type/Label (Detailseiten) */
+export function decoGifFor(party: {
+  types: string[];
+  labels: string[];
+}): string {
+  const hay = [...party.types, ...party.labels].join(" ").toLowerCase();
+  if (hay.includes("methodist")) return "/branding/deco-methodist.gif";
+  return "/branding/old_church_trees_wind_blowing_md_wht.gif";
+}
+
 export function formatDate(value: string | null) {
   if (!value) return null;
   if (/^\d{4}$/.test(value)) return value;
-
   const isMonthOnly = /^\d{4}-\d{2}$/.test(value);
   const normalized = isMonthOnly ? `${value}-01` : value;
   const date = new Date(`${normalized}T00:00:00Z`);
