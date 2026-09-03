@@ -423,6 +423,11 @@ export default async function PartyPage({ params }: PageProps) {
             </section>
           </div>
         </div>
+
+        <div className="directory-deco" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/branding/church-trees.gif" alt="" />
+        </div>
       </div>
       <footer>
         <Link href="/">← Return to index page</Link>
