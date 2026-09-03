@@ -135,6 +135,23 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   line-height: 1.45;
 }
 
+.site-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.header-dove {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border: 1px solid #fff;
+  image-rendering: auto;
+}
+
 .retro-button {
   min-width: 92px;
   padding: 9px 13px;
@@ -1107,6 +1124,7 @@ footer {
   }
   .site-header p { display: none; }
   .brand img { width: 44px; height: 44px; }
+  .header-dove { width: 44px; height: 44px; }
   .main-nav { overflow-x: auto; }
   .main-nav a { white-space: nowrap; }
   .intro-strip { padding: 18px 5px; }
