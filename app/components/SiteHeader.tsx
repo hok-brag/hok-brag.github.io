@@ -10,8 +10,7 @@ export function SiteHeader() {
         <div className="site-identity">
           <Link className="brand" href="/">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${basePath}/branding/PPDB.png`} alt="PPDB logo" />
-            <span>Church Communion Database</span>
+<img src={`${basePath}/branding/fish3.gif`} alt="CCDB logo" />            <span>Church Communion Database</span>
           </Link>
           <p>Open-source database of church unions worldwide.</p>
         </div>
