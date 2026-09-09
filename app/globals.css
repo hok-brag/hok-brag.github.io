@@ -597,6 +597,18 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   image-rendering: auto;
 }
 
+.directory-deco .deco-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .directory-deco .deco-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .directory-deco .deco-dark {
+  display: block;
+}
+
 .notes-panel { margin-top: 12px; }
 
 .notes-grid {
