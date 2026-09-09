@@ -91,6 +91,8 @@ export function decoGifFor(party: {
   if (hay.includes("lutheran")) return "/branding/deco-lutheran.gif";
   if (hay.includes("roman catholic")) return "/branding/deco-catholic.gif";
   if (hay.includes("maori")) return "/branding/deco-maori.gif";
+  if (hay.includes("syriac")) return "/branding/deco-syriac.gif";
+  if (hay.includes("adventist")) return "/branding/deco-advent.gif";
 return "/branding/church-trees.gif";
 }
 
