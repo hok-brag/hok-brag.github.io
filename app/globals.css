@@ -1175,3 +1175,19 @@ footer {
     scroll-behavior: auto !important;
   }
 }
+
+.footer-compat {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin-top: 0.35em;
+}
+
+.footer-point {
+  display: inline-block;
+  width: 40px;
+  height: auto;
+  vertical-align: middle;
+  image-rendering: auto;
+}
