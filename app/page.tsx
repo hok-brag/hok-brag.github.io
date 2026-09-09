@@ -33,52 +33,50 @@ export default function Home() {
           </div>
           <p>
             This project is not a reliable source of information and was created by a single
-            enthusiast, it should <strong>not</strong> be used for serious purposes. Some information
-            may be outdated or dubious.
+            enthusiast, it should <strong>not</strong> be used for serious purposes. Some
+            information may be outdated or dubious.
           </p>
         </section>
 
         <PartyDirectory countries={countries} parties={parties} />
       </div>
-     <footer>
-<footer>
-  <span>CCDB — Church Communion Database</span>
-  <span className="footer-disclaimer">
-    CCDB is not a reliable source. Any data from CCDB is provided for reference{" "}
-    <strong>should not</strong> be used for serious purposes. The website
-    structure was vibecoded using ChatGPT and Grok. All entries were added by
-    humans.
-    <br />
-    <span className="footer-compat">
-  {/* eslint-disable-next-line @next/next/no-img-element */}
-  <img
-    className="footer-point"
-    src="/branding/pointing-moses.png"
-    alt=""
-    aria-hidden="true"
-  />
-  Compatible with{" "}
-  <a href="https://platelru.github.io/ppdb/" target="_blank" rel="noreferrer">
-    Political Parties Database
-  </a>{" "}
-  and{" "}
-  <a
-    href="https://bananasareviolet.github.io/epgroupbuilder/"
-    target="_blank"
-    rel="noreferrer"
-  >
-    EP Group Builder
-  </a>
-  {/* eslint-disable-next-line @next/next/no-img-element */}
-  <img
-    className="footer-point"
-    src="/branding/pointing.png"
-    alt=""
-    aria-hidden="true"
-  />
-</span>
-  </span>
-</footer>
+      <footer>
+        <span>CCDB — Church Communion Database</span>
+        <span className="footer-disclaimer">
+          CCDB is not a reliable source. Any data from CCDB is provided for reference{" "}
+          <strong>should not</strong> be used for serious purposes. The website structure was
+          vibecoded using ChatGPT and Grok. All entries were added by humans.
+          <br />
+          <span className="footer-compat">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="footer-point"
+              src="/branding/pointing-moses.png"
+              alt=""
+              aria-hidden="true"
+            />
+            Compatible with{" "}
+            <a href="https://platelru.github.io/ppdb/" target="_blank" rel="noreferrer">
+              Political Parties Database
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://bananasareviolet.github.io/epgroupbuilder/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              EP Group Builder
+            </a>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="footer-point"
+              src="/branding/pointing.png"
+              alt=""
+              aria-hidden="true"
+            />
+          </span>
+        </span>
+      </footer>
     </main>
   );
 }
