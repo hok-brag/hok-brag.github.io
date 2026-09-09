@@ -51,7 +51,7 @@ export default function Home() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="footer-point"
-              src="/branding/pointing-moses.gif"
+              src="/branding/moses_pointing.gif"
               alt=""
               aria-hidden="true"
             />
