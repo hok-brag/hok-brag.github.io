@@ -93,6 +93,7 @@ export function decoGifFor(party: {
   if (hay.includes("maori")) return "/branding/deco-maori.gif";
   if (hay.includes("syriac")) return "/branding/deco-syriac.gif";
   if (hay.includes("adventist")) return "/branding/deco-advent.gif";
+  if (hay.includes("tewahedo")) return "/branding/deco-ethiopia.gif";  
 return "/branding/church-trees.gif";
 }
 
