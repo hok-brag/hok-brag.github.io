@@ -48,19 +48,6 @@ export default function Home() {
     structure was vibecoded using ChatGPT and Grok. All entries were added by
     humans.
     <br />
-    Compatible with{" "}
-    <a href="https://platelru.github.io/ppdb/" target="_blank" rel="noreferrer">
-      Political Parties Database
-    </a>{" "}
-    and{" "}
-    <a
-      href="https://bananasareviolet.github.io/epgroupbuilder/"
-      target="_blank"
-      rel="noreferrer"
-    >
-      EP Group Builder
-    </a>
-    .
   </span>
 </footer>
     </main>
