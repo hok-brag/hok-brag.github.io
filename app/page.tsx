@@ -51,7 +51,7 @@ export default function Home() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="footer-point"
-              src="/branding/pointing-moses.png"
+              src="/branding/pointing-moses.gif"
               alt=""
               aria-hidden="true"
             />
@@ -70,7 +70,7 @@ export default function Home() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="footer-point"
-              src="/branding/pointing.png"
+              src="/branding/pointing.gif"
               alt=""
               aria-hidden="true"
             />
