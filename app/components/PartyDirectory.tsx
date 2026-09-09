@@ -631,7 +631,14 @@ export function PartyDirectory({ countries, parties }: Props) {
       <div className="directory-deco" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          className="deco-light"
           src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/branding/churchw.gif`}
+          alt=""
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="deco-dark"
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/branding/jochurch.gif`}
           alt=""
         />
       </div>
