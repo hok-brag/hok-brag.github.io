@@ -1191,3 +1191,46 @@ footer {
   vertical-align: middle;
   image-rendering: auto;
 }
+.contact-page {
+  display: grid;
+  gap: 12px;
+}
+
+.contact-panel a {
+  display: inline-block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.contact-links {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.partner-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.partner-point {
+  display: block;
+  width: 48px;
+  height: auto;
+  flex: 0 0 auto;
+  image-rendering: auto;
+}
+
+.contact-links a {
+  padding: 6px 10px;
+  background: var(--panel-light);
+  border: 1px solid var(--line);
+  text-decoration: none;
+}
+
+.contact-links a:hover {
+  background: var(--panel-hover);
+}
