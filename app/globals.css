@@ -1234,3 +1234,29 @@ footer {
 .contact-links a:hover {
   background: var(--panel-hover);
 }
+.contact-blurb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.contact-const {
+  display: block;
+  width: 48px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.contact-write {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+
+.contact-write img {
+  display: block;
+  max-width: min(280px, 100%);
+  height: auto;
+}
