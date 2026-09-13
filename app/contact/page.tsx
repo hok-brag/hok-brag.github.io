@@ -32,8 +32,15 @@ export default function ContactPage() {
 
         <section className="panel contact-panel">
           <div className="section-label">Contact</div>
-          <p className="missing-copy" style={{ margin: 0 }}>
-            No public contact channel is set yet. Partner projects:
+          <p className="contact-blurb">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="contact-const"
+              src="/branding/const.gif"
+              alt=""
+              aria-hidden="true"
+            />
+            <span>No public contact channel is set yet. Partner projects:</span>
           </p>
         </section>
 
@@ -63,6 +70,11 @@ export default function ContactPage() {
             />
           </div>
         </section>
+
+        <div className="contact-write" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/branding/writepg.gif" alt="" />
+        </div>
       </div>
       <footer>
         <Link href="/">← Return to index page</Link>
