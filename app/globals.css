@@ -1218,7 +1218,7 @@ footer {
 
 .partner-point {
   display: block;
-  width: 48px;
+  width: 96px;   /* war 48px – z.B. 72px, 96px oder 120px */
   height: auto;
   flex: 0 0 auto;
   image-rendering: auto;
