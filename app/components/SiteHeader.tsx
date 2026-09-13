@@ -29,6 +29,7 @@ export function SiteHeader() {
       <nav className="main-nav" aria-label="Primary navigation">
         <Link href="/">Index</Link>
         <Link href="/#about">About</Link>
+        <Link href="/contact">Contact</Link>
         <Link href="/data-guide">Data guide</Link>
         <a
           href="https://github.com/hok-brag/hok-brag.github.io/blob/main/data/PPDB%20database.xlsx"
