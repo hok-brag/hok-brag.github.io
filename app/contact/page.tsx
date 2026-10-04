@@ -19,6 +19,10 @@ const partnerSites = [
     href: "https://bananasareviolet.github.io/eestimate/",
     label: "EEstimate",
   },
+  {
+    href: "https://polandelects.com/",
+    label: "Poland Elects",
+  },
 ];
 
 export default function ContactPage() {
